@@ -1,0 +1,31 @@
+# Version control and local environments
+.git
+.gitignore
+.venv/
+venv/
+env/
+
+# Python generated files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Local databases and secrets/configuration
+*.sqlite3
+*.sqlite3-journal
+.env
+.env.*
+!.env.example
+
+# Tests, coverage, and temporary output
+.pytest_cache/
+.tox/
+.nox/
+.coverage
+.coverage.*
+htmlcov/
+test-results/
+*.log
+*.tmp
+*.swp
+.DS_Store
