@@ -9,8 +9,6 @@ https://docs.djangoproject.com/en/5.2/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.2/ref/settings/
 """
-# settings.py
-
 import os
 from pathlib import Path
 
@@ -18,11 +16,19 @@ from django.core.exceptions import ImproperlyConfigured
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+
+def environment_bool(name, default=False):
+    value = os.environ.get(name, str(default)).strip().lower()
+    if value not in {"1", "true", "yes", "on", "0", "false", "no", "off"}:
+        raise ImproperlyConfigured(f"{name} must be set to a boolean value.")
+    return value in {"1", "true", "yes", "on"}
+
+
 SECRET_KEY = os.environ.get("DJANGO_SECRET_KEY")
 if not SECRET_KEY:
     raise ImproperlyConfigured("DJANGO_SECRET_KEY environment variable must be set.")
 
-DEBUG = os.environ.get("DJANGO_DEBUG", "false").strip().lower() in {"1", "true", "yes", "on"}
+DEBUG = environment_bool("DJANGO_DEBUG", default=False)
 
 ALLOWED_HOSTS = [
     host.strip()
@@ -54,7 +60,7 @@ ROOT_URLCONF = 'devops.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [os.path.join(BASE_DIR, 'demo/templates')],
+        'DIRS': [BASE_DIR / 'demo' / 'templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -108,6 +114,6 @@ STATIC_URL = '/static/'
 # Default primary key field type
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-# HTTPS Settings
-SECURE_SSL_REDIRECT = True
+# HTTPS settings. The trusted proxy must set X-Forwarded-Proto correctly.
+SECURE_SSL_REDIRECT = environment_bool("DJANGO_SECURE_SSL_REDIRECT", default=False)
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
