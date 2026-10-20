@@ -8,7 +8,8 @@ WORKDIR /app
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt \
     && groupadd --system app \
-    && useradd --system --gid app --home-dir /app --shell /usr/sbin/nologin app
+    && useradd --system --gid app --home-dir /app --shell /usr/sbin/nologin app \
+    && chown app:app /app
 
 COPY --chown=app:app devops/ /app/
 
