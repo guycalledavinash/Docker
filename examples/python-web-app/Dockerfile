@@ -1,22 +1,19 @@
-FROM ubuntu
+FROM python:3.13-slim-bookworm
+
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1
 
 WORKDIR /app
 
-COPY requirements.txt /app/
-COPY devops /app/
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt \
+    && groupadd --system app \
+    && useradd --system --gid app --home-dir /app --shell /usr/sbin/nologin app
 
-RUN apt-get update && apt-get install -y python3 python3-pip python3-venv
+COPY --chown=app:app devops/ /app/devops/
 
-SHELL ["/bin/bash", "-c"]
-
-RUN python3 -m venv venv1 && \
-source venv1/bin/activate && \
-pip install --no-cache-dir -r requirements.txt
+USER app
 
 EXPOSE 8000
 
-CMD source venv1/bin/activate && python3 manage.py runserver 0.0.0.0:8000
-
-
-
-
+CMD ["gunicorn", "--bind", "0.0.0.0:8000", "devops.wsgi:application"]
