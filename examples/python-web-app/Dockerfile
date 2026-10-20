@@ -10,7 +10,7 @@ RUN pip install --no-cache-dir -r requirements.txt \
     && groupadd --system app \
     && useradd --system --gid app --home-dir /app --shell /usr/sbin/nologin app
 
-COPY --chown=app:app devops/ /app/devops/
+COPY --chown=app:app devops/ /app/
 
 USER app
 
